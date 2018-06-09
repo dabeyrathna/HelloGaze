@@ -1,11 +1,9 @@
-﻿//-----------------------------------------------------------------------
-// Copyright 2014 Tobii Technology AB. All rights reserved.
-//-----------------------------------------------------------------------
-
+﻿
 using EyeXFramework;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Forms;
 
 namespace GazeAwareForms
@@ -19,25 +17,16 @@ namespace GazeAwareForms
         Pen p;
         int count = 0;
 
+        
+        string path = "";
+
         public GazeAwareForm()
         {
             InitializeComponent();
-
-            // Add eye-gaze interaction behaviors to the panels on the form.
-            // The panels should display a border when the user's gaze are on them.
-            // Note that panel4 is nested inside panel2. This means that any time 
-            // panel2 has the user's gaze, panel4 will too.
             Program.EyeXHost.Connect(behaviorMap1);
             behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
             bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
             p = new Pen(Color.Green, 3);
-
-
-            //var stream = Program.EyeXHost.CreateEyePositionDataStream();
-
-            //stream.Next += (s, e) => MessageBox.Show("dsdasd", "sfsdfdsfds");
-
-
         }
 
         Bitmap bmp;
@@ -46,11 +35,31 @@ namespace GazeAwareForms
         {
             base.OnLoad(e);
             g = Graphics.FromImage(bmp);
-            g.DrawLine(new Pen(Color.Blue, 10), 700, 200, 100, 300);
-            
+
+            initialDrawings(g,panel1);
         }
 
- 
+
+        private void initialDrawings(Graphics g, Panel panel1) {
+
+            int panelCenterX = panel1.Width / 2;
+            int panelCenterY = panel1.Height / 2;
+            float radius = 20;
+
+            SolidBrush myBrush = new SolidBrush(Color.Black);
+
+            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY - 200, panelCenterX + 300, panelCenterY - 200);
+            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY, panelCenterX + 300, panelCenterY);
+            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
+            g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
+
+            PictureBox initBrush = new PictureBox();
+            initBrush.Location = new Point(panelCenterX-10, panelCenterY-10);
+            initBrush.Size = new Size(panelCenterX+10, panelCenterY+10);
+            initBrush.BorderStyle = BorderStyle.FixedSingle;
+            this.Controls.Add(initBrush);
+
+        }
 
         private void OnGaze(object sender, GazeAwareEventArgs e)
         {
@@ -94,11 +103,9 @@ namespace GazeAwareForms
             if (startPaint)
             {
                 using (g = Graphics.FromImage(bmp))
-                {
-                    
+                {                    
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-                    //p = new Pen(Color.Green, 3);
                     if (label2.Visible)
                     {
                         p.Color = Color.Yellow;
@@ -128,11 +135,23 @@ namespace GazeAwareForms
             e.Graphics.DrawImage(bmp, Point.Empty);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void changePath()
         {
-            bmp.Save("D://savedItems//OutFile " + count+".jpg", ImageFormat.Jpeg);
-            count++;
+            Random r = new Random();
+            int rInt = r.Next(0, 10000);
+            // string patientID = "Patient" + rInt;
+            string patientID = "Patient";
+            path = @"" + Application.StartupPath + "\\" + patientID;
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            changePath();
+            string fileName = String.Format(@"{0}\OutFile " + count + ".jpg", path);
+            bmp.Save(fileName, ImageFormat.Jpeg);
+            count++;
+        }
     }
 }

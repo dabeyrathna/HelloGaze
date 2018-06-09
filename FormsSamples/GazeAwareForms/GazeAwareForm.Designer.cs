@@ -35,7 +35,6 @@
             this.btnSaveImage = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.lblCoords = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // panel1
@@ -84,21 +83,11 @@
             this.label2.Text = "vb";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lblCoords
-            // 
-            this.lblCoords.AutoSize = true;
-            this.lblCoords.Location = new System.Drawing.Point(1118, 13);
-            this.lblCoords.Name = "lblCoords";
-            this.lblCoords.Size = new System.Drawing.Size(11, 17);
-            this.lblCoords.TabIndex = 11;
-            this.lblCoords.Text = "l";
-            // 
             // GazeAwareForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1490, 802);
-            this.Controls.Add(this.lblCoords);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSaveImage);
@@ -119,7 +108,6 @@
         private System.Windows.Forms.Button btnSaveImage;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label lblCoords;
     }
 }
 
