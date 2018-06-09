@@ -54,8 +54,8 @@ namespace GazeAwareForms
             g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
             g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
-            panel2.Location = new Point(panelCenterX - 100, panelCenterY - 100);
-            panel2.Size = new Size(200, 200);
+            panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
+            panel2.Size = new Size(100, 100);
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
             panel2.BringToFront();
