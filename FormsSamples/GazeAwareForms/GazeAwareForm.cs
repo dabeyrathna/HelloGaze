@@ -24,7 +24,8 @@ namespace GazeAwareForms
         {
             InitializeComponent();
             Program.EyeXHost.Connect(behaviorMap1);
-            behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
+           // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
+            behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze));
             bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
             p = new Pen(Color.Green, 3);
         }
@@ -53,11 +54,19 @@ namespace GazeAwareForms
             g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
             g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
-            PictureBox initBrush = new PictureBox();
-            initBrush.Location = new Point(panelCenterX-10, panelCenterY-10);
-            initBrush.Size = new Size(panelCenterX+10, panelCenterY+10);
-            initBrush.BorderStyle = BorderStyle.FixedSingle;
-            this.Controls.Add(initBrush);
+            panel2.Location = new Point(panelCenterX - 100, panelCenterY - 100);
+            panel2.Size = new Size(200, 200);
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
+            panel2.BringToFront();
+            /*
+            PictureBox centerBox = new PictureBox();
+            centerBox.Location = new Point(panelCenterX-5, panelCenterY-5);
+            centerBox.Size = new Size(100, 100);
+            centerBox.BorderStyle = BorderStyle.FixedSingle;            
+            this.Controls.Add(centerBox);
+            centerBox.BringToFront();
+            */
 
         }
 

@@ -35,11 +35,14 @@
             this.btnSaveImage = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.panel2);
             this.panel1.Location = new System.Drawing.Point(143, 97);
             this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
@@ -83,6 +86,13 @@
             this.label2.Text = "vb";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // panel2
+            // 
+            this.panel2.Location = new System.Drawing.Point(1041, 184);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(107, 100);
+            this.panel2.TabIndex = 0;
+            // 
             // GazeAwareForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -96,6 +106,7 @@
             this.Name = "GazeAwareForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gaze-Aware Windows Forms Sample";
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -108,6 +119,7 @@
         private System.Windows.Forms.Button btnSaveImage;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Panel panel2;
     }
 }
 
