@@ -59,15 +59,6 @@ namespace GazeAwareForms
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
             panel2.BringToFront();
-            /*
-            PictureBox centerBox = new PictureBox();
-            centerBox.Location = new Point(panelCenterX-5, panelCenterY-5);
-            centerBox.Size = new Size(100, 100);
-            centerBox.BorderStyle = BorderStyle.FixedSingle;            
-            this.Controls.Add(centerBox);
-            centerBox.BringToFront();
-            */
-
         }
 
         private void OnGaze(object sender, GazeAwareEventArgs e)
