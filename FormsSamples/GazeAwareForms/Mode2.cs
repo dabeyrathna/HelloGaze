@@ -1,33 +1,36 @@
 ﻿
 using EyeXFramework;
+using EyeXFramework.Forms;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GazeAwareForms
 {
-    public partial class GazeAwareForm : Form
+    public partial class Mode2 : Form
     {
         Graphics g;
         bool startPaint = false;
         int? initX = null;
         int? initY = null;
         Pen p;
-        int count = 0;
+        int count, countIntermediate = 0;
 
-        
         string path = "";
 
-        public GazeAwareForm()
+        public Mode2()
         {
             InitializeComponent();
-            Program.EyeXHost.Connect(behaviorMap1);
-           // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
-            behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze));
-            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+
+            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
+            behaviorMap1.Add(panel2, new EyeXFramework.GazeAwareBehavior(OnGaze));
             p = new Pen(Color.Green, 3);
+
+            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
         }
 
         Bitmap bmp;
@@ -37,12 +40,11 @@ namespace GazeAwareForms
             base.OnLoad(e);
             g = Graphics.FromImage(bmp);
 
-            initialDrawings(g,panel1);
+            initialDrawings(g, panel1);
         }
 
-
-        private void initialDrawings(Graphics g, Panel panel1) {
-
+        private void initialDrawings(Graphics g, Panel panel1)
+        {
             int panelCenterX = panel1.Width / 2;
             int panelCenterY = panel1.Height / 2;
             float radius = 20;
@@ -55,7 +57,7 @@ namespace GazeAwareForms
             g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
             panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
-            panel2.Size = new Size(100, 100);
+            panel2.Size = new System.Drawing.Size(100, 100);
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
             panel2.BringToFront();
@@ -72,13 +74,15 @@ namespace GazeAwareForms
                 {
                     runOnOutOfForcus();
                 }
-                else {
+                else
+                {
                     runOnForcus();
                 }
             }
         }
-
-        private void runOnForcus() {
+        
+        private void runOnForcus()
+        {
             label2.Visible = false;
             label1.Visible = true;
             label1.Text = "Great You are on focus..";
@@ -103,19 +107,21 @@ namespace GazeAwareForms
             if (startPaint)
             {
                 using (g = Graphics.FromImage(bmp))
-                {                    
+                {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
                     if (label2.Visible)
                     {
                         p.Color = Color.Yellow;
+
                     }
-                    else {
+                    else
+                    {
                         p.Color = Color.Green;
                     }
-                   
+
                     g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
-                    
+
                     initX = e.X;
                     initY = e.Y;
                 }
@@ -144,6 +150,14 @@ namespace GazeAwareForms
             path = @"" + Application.StartupPath + "\\" + patientID;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+        }
+
+        private void saveIntermediateTracing()
+        {
+            changePath();
+            string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
+            bmp.Save(fileName, ImageFormat.Jpeg);
+            countIntermediate++;
         }
 
         private void button1_Click(object sender, EventArgs e)

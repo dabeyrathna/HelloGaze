@@ -102,28 +102,51 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tobii.EyeX.Client.Net20, Version=1.8.503.0, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Tobii.EyeX.Client.1.8.503\lib\net20\Tobii.EyeX.Client.Net20.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Tobii.EyeX.Client.Net20, Version=1.8.504.0, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Tobii.EyeX.Client.1.8.504\lib\net20\Tobii.EyeX.Client.Net20.dll</HintPath>
+    </Reference>
+    <Reference Include="Tobii.Interaction.Model, Version=0.7.3.333, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Tobii.Interaction.0.7.3\lib\net45\Tobii.Interaction.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Tobii.Interaction.Net, Version=0.7.3.333, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Tobii.Interaction.0.7.3\lib\net45\Tobii.Interaction.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Tobii.Research, Version=1.5.0.942, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Tobii.Research.x86.1.5.0.942\lib\net45\Tobii.Research.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GazeAwareForm.cs">
+    <Compile Include="Mode1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GazeAwareForm.Designer.cs">
-      <DependentUpon>GazeAwareForm.cs</DependentUpon>
+    <Compile Include="Mode1.Designer.cs">
+      <DependentUpon>Mode1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Mode2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Mode2.Designer.cs">
+      <DependentUpon>Mode2.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StartForm.Designer.cs">
+      <DependentUpon>StartForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl1.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="GazeAwareForm.resx">
-      <DependentUpon>GazeAwareForm.cs</DependentUpon>
+    <EmbeddedResource Include="Mode1.resx">
+      <DependentUpon>Mode1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mode2.resx">
+      <DependentUpon>Mode2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -135,9 +158,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="StartForm.resx">
+      <DependentUpon>StartForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControl1.resx">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -172,13 +199,23 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Tobii.EyeX.Client.1.8.503\build\Tobii.EyeX.Client.targets" Condition="Exists('..\..\packages\Tobii.EyeX.Client.1.8.503\build\Tobii.EyeX.Client.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Tobii.EyeX.Client.1.8.503\build\Tobii.EyeX.Client.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.EyeX.Client.1.8.503\build\Tobii.EyeX.Client.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.StreamEngine.2.2.2.363\build\Tobii.StreamEngine.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.StreamEngine.2.2.2.363\build\Tobii.StreamEngine.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.StreamEngine.Native.2.2.2.363\build\Tobii.StreamEngine.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.StreamEngine.Native.2.2.2.363\build\Tobii.StreamEngine.Native.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.Interaction.0.7.3\build\Tobii.Interaction.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.Interaction.0.7.3\build\Tobii.Interaction.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.EyeX.Client.1.8.504\build\Tobii.EyeX.Client.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.EyeX.Client.1.8.504\build\Tobii.EyeX.Client.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.Research.x64.1.5.0.942\build\Tobii.Research.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.Research.x64.1.5.0.942\build\Tobii.Research.x64.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Tobii.Research.x86.1.5.0.942\build\Tobii.Research.x86.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Tobii.Research.x86.1.5.0.942\build\Tobii.Research.x86.targets'))" />
   </Target>
+  <Import Project="..\..\packages\Tobii.StreamEngine.2.2.2.363\build\Tobii.StreamEngine.targets" Condition="Exists('..\..\packages\Tobii.StreamEngine.2.2.2.363\build\Tobii.StreamEngine.targets')" />
+  <Import Project="..\..\packages\Tobii.StreamEngine.Native.2.2.2.363\build\Tobii.StreamEngine.Native.targets" Condition="Exists('..\..\packages\Tobii.StreamEngine.Native.2.2.2.363\build\Tobii.StreamEngine.Native.targets')" />
+  <Import Project="..\..\packages\Tobii.Interaction.0.7.3\build\Tobii.Interaction.targets" Condition="Exists('..\..\packages\Tobii.Interaction.0.7.3\build\Tobii.Interaction.targets')" />
+  <Import Project="..\..\packages\Tobii.EyeX.Client.1.8.504\build\Tobii.EyeX.Client.targets" Condition="Exists('..\..\packages\Tobii.EyeX.Client.1.8.504\build\Tobii.EyeX.Client.targets')" />
+  <Import Project="..\..\packages\Tobii.Research.x64.1.5.0.942\build\Tobii.Research.x64.targets" Condition="Exists('..\..\packages\Tobii.Research.x64.1.5.0.942\build\Tobii.Research.x64.targets')" />
+  <Import Project="..\..\packages\Tobii.Research.x86.1.5.0.942\build\Tobii.Research.x86.targets" Condition="Exists('..\..\packages\Tobii.Research.x86.1.5.0.942\build\Tobii.Research.x86.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

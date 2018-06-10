@@ -1,6 +1,6 @@
 ﻿namespace GazeAwareForms
 {
-    partial class GazeAwareForm
+    partial class Mode1
     {
         /// <summary>
         /// Required designer variable.
