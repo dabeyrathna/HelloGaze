@@ -34,71 +34,54 @@ namespace GazeAwareForms
 
             eyePositionStream = host.Streams.CreateEyePositionStream();//  CreateEyePositionDataStream()
 
+            collectCoordinates();
+            collectCoords();
+            mouseMove();
 
         }
 
-        private void collectCoordinates(bool start)
+        private void collectCoordinates()
         {
-            if (start)
+            fixationDataStream.Next += (o, fixation) =>
             {
-                fixationDataStream.Next += (o, fixation) =>
-                {
-                    // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
-                    var fixationPointX = fixation.Data.X;
-                    var fixationPointY = fixation.Data.Y;
+                // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
+                var fixationPointX = fixation.Data.X;
+                var fixationPointY = fixation.Data.Y;
 
 
-                    textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
-                    //label2.Invoke((MethodInvoker)(() => label2.Text = fixationPointY.ToString()));
+                textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
+                //label2.Invoke((MethodInvoker)(() => label2.Text = fixationPointY.ToString()));
 
-                    list1.Add("X is = " + fixation.Data.X + "   y is = " + fixation.Data.Y);
-                    };
-            }
+                list1.Add("X is = " + fixation.Data.X + "   y is = " + fixation.Data.Y);
+            };
         }
 
-        private void collectCoords(bool start)
+        private void collectCoords()
         {
-            if (start)
+            eyePositionStream.Next += (o, fixation) =>
             {
-                eyePositionStream.Next += (o, fixation) =>
-                {
-                    // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
-                    var fixationPointX = fixation.Data.LeftEye.X;
-                    var fixationPointY = fixation.Data.LeftEye.Y;
-                    var fixationPointZ = fixation.Data.LeftEye.Z;
+                // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
+                var fixationPointX = fixation.Data.LeftEye.X;
+                var fixationPointY = fixation.Data.LeftEye.Y;
+                var fixationPointZ = fixation.Data.LeftEye.Z;
 
-                    textBox2.Invoke((MethodInvoker)(() => textBox2.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
-                    list2.Add("X is = " + fixationPointX + "   y is = " + fixationPointY + "   z is = " + fixationPointZ);
-                };
-            }
+                textBox2.Invoke((MethodInvoker)(() => textBox2.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
+                list2.Add("X is = " + fixationPointX + "   y is = " + fixationPointY + "   z is = " + fixationPointZ);
+            };
         }
 
-        private void mouseMove(bool start) {
-            if (start) {
-                    textBox3.Invoke((MethodInvoker)(() => textBox3.Text += ("\n" + textBox3.PointToClient(Control.MousePosition))));
-            }
-            //textBox3.Invoke((MethodInvoker)(() => textBox3.Text += ("\n" + Cursor.Position.X + "    " + Cursor.Position.Y)));
-            
+        private void mouseMove() {
+            // textBox3.Invoke((MethodInvoker)(() => textBox3.Text += ("\n" + textBox3.PointToClient(Control.MousePosition))));
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            bool start = false;
-            collectCoordinates(start);
-            collectCoords(start);
-            mouseMove(start);
 
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox3.Clear();
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            bool start = true;
-            collectCoordinates(start);
-            collectCoords(start);
-            mouseMove(start);
+
         }
     }
 }

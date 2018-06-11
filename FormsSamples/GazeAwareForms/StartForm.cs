@@ -25,8 +25,8 @@ namespace GazeAwareForms
 
         private void btnMode2_Click(object sender, EventArgs e)
         {
-            //Form mode2 = new Mode2(); 
-           // mode2.Show(); 
+            Form mode2 = new Mode2(); 
+            mode2.Show(); 
         }
     }
 }
