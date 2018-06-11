@@ -28,5 +28,10 @@ namespace GazeAwareForms
             Form mode2 = new Mode2(); 
             mode2.Show(); 
         }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
