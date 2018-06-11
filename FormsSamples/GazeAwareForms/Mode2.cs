@@ -1,171 +1,104 @@
-﻿
-using EyeXFramework;
-using EyeXFramework.Forms;
+﻿using EyeXFramework.Forms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tobii.Interaction;
+using Tobii.Interaction.Framework;
 
 namespace GazeAwareForms
 {
     public partial class Mode2 : Form
     {
-        Graphics g;
-        bool startPaint = false;
-        int? initX = null;
-        int? initY = null;
-        Pen p;
-        int count, countIntermediate = 0;
+        List<string> list1 = new List<string>();
+        List<string> list2 = new List<string>();
+       
 
-        string path = "";
+        private readonly Host host;
+        private readonly Tobii.Interaction.FixationDataStream fixationDataStream;
+        private readonly EyePositionStream eyePositionStream;
+        private static FormsEyeXHost _eyeXHost = new FormsEyeXHost();
 
         public Mode2()
         {
             InitializeComponent();
 
-            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
-            behaviorMap1.Add(panel2, new EyeXFramework.GazeAwareBehavior(OnGaze));
-            p = new Pen(Color.Green, 3);
+            host = new Host();
+            fixationDataStream = host.Streams.CreateFixationDataStream();
 
-            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+            eyePositionStream = host.Streams.CreateEyePositionStream();//  CreateEyePositionDataStream()
+
+
         }
 
-        Bitmap bmp;
-
-        protected override void OnLoad(EventArgs e)
+        private void collectCoordinates(bool start)
         {
-            base.OnLoad(e);
-            g = Graphics.FromImage(bmp);
-
-            initialDrawings(g, panel1);
-        }
-
-        private void initialDrawings(Graphics g, Panel panel1)
-        {
-            int panelCenterX = panel1.Width / 2;
-            int panelCenterY = panel1.Height / 2;
-            float radius = 20;
-
-            SolidBrush myBrush = new SolidBrush(Color.Black);
-
-            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY - 200, panelCenterX + 300, panelCenterY - 200);
-            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY, panelCenterX + 300, panelCenterY);
-            g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
-            g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
-
-            panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
-            panel2.Size = new System.Drawing.Size(100, 100);
-            panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
-            panel2.BringToFront();
-        }
-
-        private void OnGaze(object sender, GazeAwareEventArgs e)
-        {
-            var panel = sender as Panel;
-            if (panel != null)
+            if (start)
             {
-                panel.BorderStyle = (e.HasGaze) ? BorderStyle.FixedSingle : BorderStyle.None;
-
-                if (!e.HasGaze)
+                fixationDataStream.Next += (o, fixation) =>
                 {
-                    runOnOutOfForcus();
-                }
-                else
-                {
-                    runOnForcus();
-                }
-            }
-        }
-        
-        private void runOnForcus()
-        {
-            label2.Visible = false;
-            label1.Visible = true;
-            label1.Text = "Great You are on focus..";
-            label1.ForeColor = Color.Green;
-        }
+                    // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
+                    var fixationPointX = fixation.Data.X;
+                    var fixationPointY = fixation.Data.Y;
 
-        private void runOnOutOfForcus()
-        {
-            label2.Visible = true;
-            label1.Visible = false;
-            label2.Text = "Hei.. focus on the drawing area... ";
-            label2.ForeColor = Color.Red;
-        }
 
-        private void panel1_MouseDown(object sender, MouseEventArgs e)
-        {
-            startPaint = true;
-        }
+                    textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
+                    //label2.Invoke((MethodInvoker)(() => label2.Text = fixationPointY.ToString()));
 
-        private void panel1_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (startPaint)
-            {
-                using (g = Graphics.FromImage(bmp))
-                {
-                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-                    if (label2.Visible)
-                    {
-                        p.Color = Color.Yellow;
-
-                    }
-                    else
-                    {
-                        p.Color = Color.Green;
-                    }
-
-                    g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
-
-                    initX = e.X;
-                    initY = e.Y;
-                }
-                panel1.Invalidate();
+                    list1.Add("X is = " + fixation.Data.X + "   y is = " + fixation.Data.Y);
+                    };
             }
         }
 
-        private void panel1_MouseUp(object sender, MouseEventArgs e)
+        private void collectCoords(bool start)
         {
-            startPaint = false;
-            initX = null;
-            initY = null;
+            if (start)
+            {
+                eyePositionStream.Next += (o, fixation) =>
+                {
+                    // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
+                    var fixationPointX = fixation.Data.LeftEye.X;
+                    var fixationPointY = fixation.Data.LeftEye.Y;
+                    var fixationPointZ = fixation.Data.LeftEye.Z;
+
+                    textBox2.Invoke((MethodInvoker)(() => textBox2.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
+                    list2.Add("X is = " + fixationPointX + "   y is = " + fixationPointY + "   z is = " + fixationPointZ);
+                };
+            }
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-            e.Graphics.DrawImage(bmp, Point.Empty);
+        private void mouseMove(bool start) {
+            if (start) {
+                    textBox3.Invoke((MethodInvoker)(() => textBox3.Text += ("\n" + textBox3.PointToClient(Control.MousePosition))));
+            }
+            //textBox3.Invoke((MethodInvoker)(() => textBox3.Text += ("\n" + Cursor.Position.X + "    " + Cursor.Position.Y)));
+            
         }
 
-        private void changePath()
+        private void btnStop_Click(object sender, EventArgs e)
         {
-            Random r = new Random();
-            int rInt = r.Next(0, 10000);
-            // string patientID = "Patient" + rInt;
-            string patientID = "Patient";
-            path = @"" + Application.StartupPath + "\\" + patientID;
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            bool start = false;
+            collectCoordinates(start);
+            collectCoords(start);
+            mouseMove(start);
+
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
         }
 
-        private void saveIntermediateTracing()
+        private void btnStart_Click(object sender, EventArgs e)
         {
-            changePath();
-            string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
-            bmp.Save(fileName, ImageFormat.Jpeg);
-            countIntermediate++;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            changePath();
-            string fileName = String.Format(@"{0}\OutFile " + count + ".jpg", path);
-            bmp.Save(fileName, ImageFormat.Jpeg);
-            count++;
+            bool start = true;
+            collectCoordinates(start);
+            collectCoords(start);
+            mouseMove(start);
         }
     }
 }
