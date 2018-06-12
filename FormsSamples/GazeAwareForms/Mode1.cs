@@ -24,7 +24,7 @@ namespace GazeAwareForms
         List<string> mouseCoord = new List<string>();
         List<string> eyeCoord = new List<string>();
         bool messageBoxOn = false;
-
+        bool isFocus = true;
         string path = "";
 
         public Mode1()
@@ -34,8 +34,6 @@ namespace GazeAwareForms
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
             behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
             p = new Pen(Color.Green, 3);
-            
-            label1.Text = label2.Text = "";
         }
 
         Bitmap bmp;
@@ -48,7 +46,8 @@ namespace GazeAwareForms
         }
 
         private void initialDrawings(Panel panel1)
-        {           
+        {
+            panel1.Invalidate();
             bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
             g = Graphics.FromImage(bmp);
             g.Clear(Color.White);
@@ -123,24 +122,23 @@ namespace GazeAwareForms
         }
 
         private void runOnForcus() {
-            label2.Visible = false;
-            label1.Visible = true;
-            label1.Text = "Great You are on focus..";
-            label1.ForeColor = Color.Green;
+            isFocus = true;
         }
 
         private void runOnOutOfForcus()
         {
-            label2.Visible = true;
-            label1.Visible = false;
-            label2.Text = "Hei.. focus on the drawing area... ";
-            label2.ForeColor = Color.Red;
+            isFocus = false;
 
             if (!messageBoxOn) {
 
                 messageBoxOn = true;
 
-                DialogResult dialogResult = MessageBox.Show("Are you done tracing ?", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
+                if (Control.MouseButtons.HasFlag(MouseButtons.Left)) {
+                    initX = null;
+                    initY = null;
+                }
+
+                DialogResult dialogResult = MessageBox.Show("Are you done tracing ?\n \n1) Press Yes to trace the next line\n2) Press No to re Trace the line\n\n or \n\n Press Cancel to stop this message", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
                 if (dialogResult == DialogResult.Yes)
                 {
                     messageBoxOn = false;
@@ -158,12 +156,13 @@ namespace GazeAwareForms
                 else if (dialogResult == DialogResult.No)
                 {
                     messageBoxOn = false;
-                    // save the current content
+                    // todo save the current content
                     LineDrawing(panel1);
                 }
                 else if (dialogResult == DialogResult.Cancel) {
                     messageBoxOn = true;
                 }
+                
             }      
         }
 
@@ -176,11 +175,12 @@ namespace GazeAwareForms
         {
             if (startPaint)
             {
+                p = new Pen(Color.Green, 3);
                 using (g = Graphics.FromImage(bmp))
                 {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-                    if (label2.Visible)
+                    if (!isFocus)
                     {
                         p.Color = Color.White;                        
                     }
@@ -189,9 +189,11 @@ namespace GazeAwareForms
                     }
                    
                     g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
-                    
-                    initX = e.X;
-                    initY = e.Y;
+
+
+                        initX = e.X;
+                        initY = e.Y;
+  
                 }
                 panel1.Invalidate();
             }
