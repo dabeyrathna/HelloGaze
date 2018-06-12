@@ -31,11 +31,13 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.behaviorMap1 = new EyeXFramework.Forms.BehaviorMap(this.components);
             this.btnSaveImage = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.btnNext = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,6 +54,13 @@
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
             this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
+            // 
+            // panel2
+            // 
+            this.panel2.Location = new System.Drawing.Point(1041, 184);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(107, 100);
+            this.panel2.TabIndex = 0;
             // 
             // btnSaveImage
             // 
@@ -86,24 +95,39 @@
             this.label2.Text = "vb";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // panel2
+            // btnStart
             // 
-            this.panel2.Location = new System.Drawing.Point(1041, 184);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(107, 100);
-            this.panel2.TabIndex = 0;
+            this.btnStart.Location = new System.Drawing.Point(1429, 138);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(221, 70);
+            this.btnStart.TabIndex = 11;
+            this.btnStart.Text = "Start Tracing";
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // GazeAwareForm
+            // btnNext
+            // 
+            this.btnNext.Location = new System.Drawing.Point(1429, 307);
+            this.btnNext.Name = "btnNext";
+            this.btnNext.Size = new System.Drawing.Size(221, 46);
+            this.btnNext.TabIndex = 12;
+            this.btnNext.Text = "Go to next Line ";
+            this.btnNext.UseVisualStyleBackColor = true;
+            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
+            // 
+            // Mode1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1490, 802);
+            this.ClientSize = new System.Drawing.Size(1760, 802);
+            this.Controls.Add(this.btnNext);
+            this.Controls.Add(this.btnStart);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSaveImage);
             this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "GazeAwareForm";
+            this.Name = "Mode1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gaze-Aware Windows Forms Sample";
             this.panel1.ResumeLayout(false);
@@ -120,6 +144,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnStart;
+        private System.Windows.Forms.Button btnNext;
     }
 }
 

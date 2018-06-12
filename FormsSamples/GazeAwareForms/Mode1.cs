@@ -3,6 +3,7 @@ using EyeXFramework;
 using EyeXFramework.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -19,8 +20,11 @@ namespace GazeAwareForms
         int? initY = null;
         Pen p;
         int count, countIntermediate = 0;
+        int lineCount = 1;
+        List<string> mouseCoord = new List<string>();
+        List<string> eyeCoord = new List<string>();
+        bool messageBoxOn = false;
 
-        
         string path = "";
 
         public Mode1()
@@ -28,25 +32,27 @@ namespace GazeAwareForms
             InitializeComponent();
             Program.EyeXHost.Connect(behaviorMap1);
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
-            behaviorMap1.Add(panel2, new EyeXFramework.GazeAwareBehavior(OnGaze));
+            behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
             p = new Pen(Color.Green, 3);
-
-            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+            
+            label1.Text = label2.Text = "";
         }
 
         Bitmap bmp;
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-            g = Graphics.FromImage(bmp);
+            base.OnLoad(e);          
 
-            initialDrawings(g,panel1);
+            initialDrawings(panel1);
         }
 
+        private void initialDrawings(Panel panel1)
+        {           
+            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+            g = Graphics.FromImage(bmp);
+            g.Clear(Color.White);
 
-        private void initialDrawings(Graphics g, Panel panel1)
-        {
             int panelCenterX = panel1.Width / 2;
             int panelCenterY = panel1.Height / 2;
             float radius = 20;
@@ -56,6 +62,40 @@ namespace GazeAwareForms
             g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY - 200, panelCenterX + 300, panelCenterY - 200);
             g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY, panelCenterX + 300, panelCenterY);
             g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
+            g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
+
+           // panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
+           // panel2.Size = new System.Drawing.Size(100, 100);
+           // panel2.BorderStyle = BorderStyle.FixedSingle;
+           // panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
+           // panel2.BringToFront();
+        }
+
+        private void LineDrawing(Panel panel1) {
+
+           // g.Clear(Color.Transparent);//you can choose another color for your background here.
+            panel1.Invalidate();
+
+            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+            g = Graphics.FromImage(bmp);
+            g.Clear(Color.White);
+
+            int panelCenterX = panel1.Width / 2;
+            int panelCenterY = panel1.Height / 2;
+            float radius = 20;
+
+            SolidBrush myBrush = new SolidBrush(Color.Black);
+
+            if (lineCount == 1) {
+                g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY - 200, panelCenterX + 300, panelCenterY - 200);
+            }
+            else if (lineCount == 2) {
+                g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY, panelCenterX + 300, panelCenterY);
+            }
+            else if (lineCount == 3) {
+                g.DrawLine(new Pen(Color.Black, 10), panelCenterX - 300, panelCenterY + 200, panelCenterX + 300, panelCenterY + 200);
+            }
+                     
             g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
             panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
@@ -95,6 +135,36 @@ namespace GazeAwareForms
             label1.Visible = false;
             label2.Text = "Hei.. focus on the drawing area... ";
             label2.ForeColor = Color.Red;
+
+            if (!messageBoxOn) {
+
+                messageBoxOn = true;
+
+                DialogResult dialogResult = MessageBox.Show("Are you done tracing ?", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    messageBoxOn = false;
+                    if (lineCount < 3)
+                    {
+                        lineCount++;
+                        LineDrawing(panel1);
+                    }
+                    else {
+                        MessageBox.Show("You completed the mode 1 tracing","You are done");
+                        initialDrawings(panel1);
+                        messageBoxOn = true;
+                    } 
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                    messageBoxOn = false;
+                    // save the current content
+                    LineDrawing(panel1);
+                }
+                else if (dialogResult == DialogResult.Cancel) {
+                    messageBoxOn = true;
+                }
+            }      
         }
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
@@ -107,13 +177,12 @@ namespace GazeAwareForms
             if (startPaint)
             {
                 using (g = Graphics.FromImage(bmp))
-                {                    
+                {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
                     if (label2.Visible)
                     {
-                        p.Color = Color.Yellow;
-                        
+                        p.Color = Color.White;                        
                     }
                     else {
                         p.Color = Color.Green;
@@ -133,6 +202,12 @@ namespace GazeAwareForms
             startPaint = false;
             initX = null;
             initY = null;
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            messageBoxOn = false;
+            LineDrawing(panel1);
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -156,6 +231,22 @@ namespace GazeAwareForms
             string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
             bmp.Save(fileName, ImageFormat.Jpeg);
             countIntermediate++;
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            messageBoxOn = false;
+            if (lineCount < 3)
+            {
+                lineCount++;
+                LineDrawing(panel1);
+            }
+            else
+            {
+                MessageBox.Show("You completed the mode 1 tracing", "You are done");
+                initialDrawings(panel1);
+                messageBoxOn = true;
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
