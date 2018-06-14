@@ -15,6 +15,8 @@ namespace GazeAwareForms
     public partial class Mode1 : Form
     {
         Graphics g;
+        Patient p1;
+
         bool startPaint = false;
         int? initX = null;
         int? initY = null;
@@ -30,6 +32,9 @@ namespace GazeAwareForms
         public Mode1()
         {
             InitializeComponent();
+
+            p1 = new Patient("P123123","Adithi");
+
             Program.EyeXHost.Connect(behaviorMap1);
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
             behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
@@ -145,25 +150,65 @@ namespace GazeAwareForms
                     if (lineCount < 3)
                     {
                         lineCount++;
+                        saveFinalResult();
                         LineDrawing(panel1);
                     }
                     else {
                         MessageBox.Show("You completed the mode 1 tracing","You are done");
+                        saveFinalResult();
                         initialDrawings(panel1);
                         messageBoxOn = true;
-                    } 
+                    }
+
+                    
                 }
                 else if (dialogResult == DialogResult.No)
                 {
                     messageBoxOn = false;
                     // todo save the current content
                     LineDrawing(panel1);
+
+                    p = new Pen(Color.Green, 3);
+                    saveIntermediateResultis();
                 }
                 else if (dialogResult == DialogResult.Cancel) {
                     messageBoxOn = true;
-                }
-                
+                }             
             }      
+        }
+
+        private void saveFinalResult()
+        {
+            string fileName = "Final trace " + p1.id +".txt";
+
+            if (mouseCoord.Count > 1)
+            {
+                using (TextWriter tw = new StreamWriter(fileName, append: true))
+                {
+                    foreach (String s in mouseCoord)
+                        tw.WriteLine(s);
+
+                    tw.WriteLine("----");
+                }
+                mouseCoord.Clear();
+            }
+        }
+
+        private void saveIntermediateResultis()
+        {
+            string fileName = "Intermediate trace "+ p1.id + "Mode 1 Line "+ lineCount +".txt";
+
+            if (mouseCoord.Count > 1)
+            {
+                using (TextWriter tw = new StreamWriter(fileName, append: true))
+                {
+                    foreach (String s in mouseCoord)
+                        tw.WriteLine(s);
+
+                    tw.WriteLine("----");
+                }
+                mouseCoord.Clear();
+            }
         }
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
@@ -190,10 +235,14 @@ namespace GazeAwareForms
                    
                     g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
 
-
                         initX = e.X;
                         initY = e.Y;
-  
+
+                    if (isFocus)
+                    {
+                        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                        mouseCoord.Add(timeSapanInMillisec + ","+e.X+","+e.Y);
+                    }  
                 }
                 panel1.Invalidate();
             }
@@ -239,13 +288,15 @@ namespace GazeAwareForms
         {
             messageBoxOn = false;
             if (lineCount < 3)
-            {
+            {                
                 lineCount++;
+                saveFinalResult();
                 LineDrawing(panel1);
             }
             else
             {
                 MessageBox.Show("You completed the mode 1 tracing", "You are done");
+                saveFinalResult();
                 initialDrawings(panel1);
                 messageBoxOn = true;
             }
