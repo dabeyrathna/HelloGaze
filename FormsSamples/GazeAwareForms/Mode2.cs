@@ -17,8 +17,7 @@ namespace GazeAwareForms
     public partial class Mode2 : Form
     {
         List<string> list1 = new List<string>();
-        List<string> list2 = new List<string>();
-       
+        List<string> list2 = new List<string>();       
 
         private readonly Host host;
         private readonly Tobii.Interaction.FixationDataStream fixationDataStream;
@@ -49,7 +48,7 @@ namespace GazeAwareForms
                 var fixationPointY = fixation.Data.Y;
 
 
-                textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + fixationPointX.ToString() + "    " + fixationPointY.ToString())));
+                textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + fixationPointX.ToString()+ "    " + fixationPointY.ToString())));
                 //label2.Invoke((MethodInvoker)(() => label2.Text = fixationPointY.ToString()));
 
                 list1.Add("X is = " + fixation.Data.X + "   y is = " + fixation.Data.Y);

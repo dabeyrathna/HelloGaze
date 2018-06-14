@@ -9,6 +9,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tobii.EyeX.Framework;
+using Tobii.Interaction;
 
 namespace GazeAwareForms
 {
@@ -28,6 +30,10 @@ namespace GazeAwareForms
         bool messageBoxOn = false;
         bool isFocus = true;
         string path = "";
+        Bitmap bmp;
+
+        private readonly Host host;
+        private readonly EyePositionStream eyePositionStream;
 
         public Mode1()
         {
@@ -37,17 +43,46 @@ namespace GazeAwareForms
             mode = 1;
             Program.EyeXHost.Connect(behaviorMap1);
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
-            behaviorMap1.Add(panel2, new GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
+            behaviorMap1.Add(panel2, new EyeXFramework.GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
             p = new Pen(Color.Green, 3);
-        }
 
-        Bitmap bmp;
+            ///////////////////////////////////////
+
+            host = new Host();
+            eyePositionStream = host.Streams.CreateEyePositionStream();//  CreateEyePositionDataStream()
+
+
+            ///////////////////////////////////////
+
+
+        }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e); 
             initialDrawings(panel1);
             lblMode.Text = "Mode " + mode;
+
+            if (mode == 2) {
+                eyeCoordsCollection();
+            }
+            
+        }
+
+        private void eyeCoordsCollection()
+        {
+            if (mode == 2) // collect eye coordinates only if it is mode 2
+            {
+                //using (var lightlyFilteredGazeDataStream = Program.EyeXHost.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered))
+                //{
+                //    lightlyFilteredGazeDataStream.Next += (s, e) =>
+                //    {
+                //        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                //        eyeCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                //    };
+                //}               
+
+            }
         }
 
         private void initialDrawings(Panel panel1)
@@ -265,6 +300,19 @@ namespace GazeAwareForms
                     tw.WriteLine("----");
                 }
                 mouseCoord.Clear();
+
+                if (mode == 2) {
+                    fileName = "Final eye " + p1.id + ".txt";
+
+                    using (TextWriter tw = new StreamWriter(fileName, append: true))
+                    {
+                        foreach (String s in eyeCoord)
+                            tw.WriteLine(s);
+
+                        tw.WriteLine("----");
+                    }
+                    eyeCoord.Clear();
+                }
             }
         }
 
@@ -282,6 +330,20 @@ namespace GazeAwareForms
                     tw.WriteLine("----");
                 }
                 mouseCoord.Clear();
+
+                if (mode == 2)
+                {
+                    fileName = "Intermediate eye " + p1.id + "Mode 1 Line " + lineCount + ".txt";
+
+                    using (TextWriter tw = new StreamWriter(fileName, append: true))
+                    {
+                        foreach (String s in eyeCoord)
+                            tw.WriteLine(s);
+
+                        tw.WriteLine("----");
+                    }
+                    eyeCoord.Clear();
+                }
             }
         }
 
@@ -314,8 +376,36 @@ namespace GazeAwareForms
 
                     if (isFocus)
                     {
-                        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
-                        mouseCoord.Add(timeSapanInMillisec + ","+e.X+","+e.Y);
+                        if (mode == 1) // collect only tracing coordinates when it is mode 1
+                        {
+                            string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                            mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                        }
+                        else if (mode == 2) // collect eye coordinates only if it is mode 2
+                        {
+                            //using (var lightlyFilteredGazeDataStream = Program.EyeXHost.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered))
+                            //{
+                            //    lightlyFilteredGazeDataStream.Next += (s, eEye) =>
+                            //    {
+                            //        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                            //        eyeCoord.Add(timeSapanInMillisec + "," + eEye.X + "," + eEye.Y);
+                            //        textBox1.Invoke((MethodInvoker)(() => textBox1.Text += ("\n" + timeSapanInMillisec + "," + e.X + "," + e.Y)));
+                            //        mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                            //    };
+                            //}
+
+                            eyePositionStream.Next += (o, fixation) =>
+                            {
+                                // On the Next event, data comes as FixationData objects, wrapped in a StreamData<T> object.
+                                var fixationPointX = fixation.Data.LeftEye.X;
+                                var fixationPointY = fixation.Data.LeftEye.Y;
+                                var fixationPointZ = fixation.Data.LeftEye.Z;
+                                string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+
+                                eyeCoord.Add(timeSapanInMillisec + "," + fixationPointX + "," + fixationPointY);
+                                mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                            };
+                        }
                     }  
                 }
                 panel1.Invalidate();
@@ -332,6 +422,8 @@ namespace GazeAwareForms
         private void btnStart_Click(object sender, EventArgs e)
         {
             messageBoxOn = false;
+            lineCount = 1;
+
             if (mode == 1) {
                 LineDrawingMode1(panel1);
             }
@@ -348,20 +440,13 @@ namespace GazeAwareForms
 
         private void changePath()
         {
-            Random r = new Random();
+            Random r = new Random();                        // todo : dynamic path selection
             int rInt = r.Next(0, 10000);
             // string patientID = "Patient" + rInt;
             string patientID = "Patient";
             path = @"" + Application.StartupPath + "\\" + patientID;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-        }
-
-        private void saveIntermediateTracing() {
-            changePath();
-            string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
-            bmp.Save(fileName, ImageFormat.Jpeg);
-            countIntermediate++;
         }
 
         private void btnNext_Click(object sender, EventArgs e)
@@ -386,12 +471,19 @@ namespace GazeAwareForms
         {
             if (mode == 1) {
                 mode = 2;
-                
+                eyeCoordsCollection(); // when mode 2 activated eye coordinates collection starts
             }
             else {
                 mode = 1;
             }
             lblMode.Text = "Mode " + mode;
+        }
+
+        private void saveIntermediateTracing() {
+            changePath();
+            string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
+            bmp.Save(fileName, ImageFormat.Jpeg);
+            countIntermediate++;
         }
 
         private void button1_Click(object sender, EventArgs e)
