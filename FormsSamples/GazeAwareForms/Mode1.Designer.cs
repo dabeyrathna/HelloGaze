@@ -36,6 +36,8 @@
             this.btnSaveImage = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
+            this.btnChangeMode = new System.Windows.Forms.Button();
+            this.lblMode = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -91,11 +93,32 @@
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
+            // btnChangeMode
+            // 
+            this.btnChangeMode.Location = new System.Drawing.Point(987, 710);
+            this.btnChangeMode.Name = "btnChangeMode";
+            this.btnChangeMode.Size = new System.Drawing.Size(142, 70);
+            this.btnChangeMode.TabIndex = 13;
+            this.btnChangeMode.Text = "Change mode";
+            this.btnChangeMode.UseVisualStyleBackColor = true;
+            this.btnChangeMode.Click += new System.EventHandler(this.btnChangeMode_Click);
+            // 
+            // lblMode
+            // 
+            this.lblMode.AutoSize = true;
+            this.lblMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMode.Location = new System.Drawing.Point(759, 41);
+            this.lblMode.Name = "lblMode";
+            this.lblMode.Size = new System.Drawing.Size(0, 29);
+            this.lblMode.TabIndex = 14;
+            // 
             // Mode1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1760, 802);
+            this.Controls.Add(this.lblMode);
+            this.Controls.Add(this.btnChangeMode);
             this.Controls.Add(this.btnNext);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.btnSaveImage);
@@ -106,6 +129,7 @@
             this.Text = "Gaze-Aware Windows Forms Sample";
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -117,6 +141,8 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Button btnNext;
+        private System.Windows.Forms.Button btnChangeMode;
+        private System.Windows.Forms.Label lblMode;
     }
 }
 
