@@ -38,6 +38,7 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.btnChangeMode = new System.Windows.Forms.Button();
             this.lblMode = new System.Windows.Forms.Label();
+            this.btnVisionArea = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -75,7 +76,7 @@
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(672, 710);
+            this.btnStart.Location = new System.Drawing.Point(491, 710);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(142, 70);
             this.btnStart.TabIndex = 11;
@@ -85,7 +86,7 @@
             // 
             // btnNext
             // 
-            this.btnNext.Location = new System.Drawing.Point(830, 710);
+            this.btnNext.Location = new System.Drawing.Point(649, 710);
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(142, 70);
             this.btnNext.TabIndex = 12;
@@ -95,7 +96,7 @@
             // 
             // btnChangeMode
             // 
-            this.btnChangeMode.Location = new System.Drawing.Point(987, 710);
+            this.btnChangeMode.Location = new System.Drawing.Point(806, 710);
             this.btnChangeMode.Name = "btnChangeMode";
             this.btnChangeMode.Size = new System.Drawing.Size(142, 70);
             this.btnChangeMode.TabIndex = 13;
@@ -112,11 +113,22 @@
             this.lblMode.Size = new System.Drawing.Size(0, 29);
             this.lblMode.TabIndex = 14;
             // 
+            // btnVisionArea
+            // 
+            this.btnVisionArea.Location = new System.Drawing.Point(983, 735);
+            this.btnVisionArea.Name = "btnVisionArea";
+            this.btnVisionArea.Size = new System.Drawing.Size(139, 23);
+            this.btnVisionArea.TabIndex = 15;
+            this.btnVisionArea.Text = "SHow vision area";
+            this.btnVisionArea.UseVisualStyleBackColor = true;
+            this.btnVisionArea.Click += new System.EventHandler(this.btnVisionArea_Click);
+            // 
             // Mode1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1760, 802);
+            this.Controls.Add(this.btnVisionArea);
             this.Controls.Add(this.lblMode);
             this.Controls.Add(this.btnChangeMode);
             this.Controls.Add(this.btnNext);
@@ -143,6 +155,7 @@
         private System.Windows.Forms.Button btnNext;
         private System.Windows.Forms.Button btnChangeMode;
         private System.Windows.Forms.Label lblMode;
+        private System.Windows.Forms.Button btnVisionArea;
     }
 }
 

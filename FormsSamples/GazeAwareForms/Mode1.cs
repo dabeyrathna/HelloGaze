@@ -32,6 +32,8 @@ namespace GazeAwareForms
         string path = "";
         Bitmap bmp;
 
+        bool visibleArea = false;
+
         private readonly Host host;
         private readonly EyePositionStream eyePositionStream;
 
@@ -69,21 +71,6 @@ namespace GazeAwareForms
             
         }
 
-        private void eyeCoordsCollection()
-        {
-            if (mode == 2) // collect eye coordinates only if it is mode 2
-            {
-                //using (var lightlyFilteredGazeDataStream = Program.EyeXHost.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered))
-                //{
-                //    lightlyFilteredGazeDataStream.Next += (s, e) =>
-                //    {
-                //        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
-                //        eyeCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
-                //    };
-                //}               
-
-            }
-        }
 
         private void initialDrawings(Panel panel1)
         {
@@ -204,7 +191,7 @@ namespace GazeAwareForms
            // panel2.Size = new System.Drawing.Size(100, 100);
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
-            panel2.Visible = false;
+            panel2.Visible = visibleArea;
             panel2.BringToFront();
         }
 
@@ -294,8 +281,11 @@ namespace GazeAwareForms
             {
                 using (TextWriter tw = new StreamWriter(fileName, append: true))
                 {
-                    foreach (String s in mouseCoord)
-                        tw.WriteLine(s);
+                    //foreach (String s in tempList)
+                    //    tw.WriteLine(s);
+
+                    for(int i = 0; i < mouseCoord.Count; i++)
+                        tw.WriteLine(mouseCoord[i]);
 
                     tw.WriteLine("----");
                 }
@@ -306,8 +296,8 @@ namespace GazeAwareForms
 
                     using (TextWriter tw = new StreamWriter(fileName, append: true))
                     {
-                        foreach (String s in eyeCoord)
-                            tw.WriteLine(s);
+                        for (int i = 0; i < eyeCoord.Count; i++)
+                            tw.WriteLine(eyeCoord[i]);
 
                         tw.WriteLine("----");
                     }
@@ -324,26 +314,26 @@ namespace GazeAwareForms
             {
                 using (TextWriter tw = new StreamWriter(fileName, append: true))
                 {
-                    foreach (String s in mouseCoord)
-                        tw.WriteLine(s);
+                    for (int i = 0; i < mouseCoord.Count; i++)
+                        tw.WriteLine(mouseCoord[i]);
 
                     tw.WriteLine("----");
                 }
                 mouseCoord.Clear();
 
-                if (mode == 2)
-                {
-                    fileName = "Intermediate eye " + p1.id + "Mode 1 Line " + lineCount + ".txt";
+                //if (mode == 2)
+                //{
+                //    fileName = "Intermediate eye " + p1.id + "Mode 1 Line " + lineCount + ".txt";
 
-                    using (TextWriter tw = new StreamWriter(fileName, append: true))
-                    {
-                        foreach (String s in eyeCoord)
-                            tw.WriteLine(s);
+                //    using (TextWriter tw = new StreamWriter(fileName, append: true))
+                //    {
+                //        foreach (String s in eyeCoord)
+                //            tw.WriteLine(s);
 
-                        tw.WriteLine("----");
-                    }
-                    eyeCoord.Clear();
-                }
+                //        tw.WriteLine("----");
+                //    }
+                //    eyeCoord.Clear();
+                //}
             }
         }
 
@@ -371,8 +361,8 @@ namespace GazeAwareForms
                    
                     g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
 
-                        initX = e.X;
-                        initY = e.Y;
+                    initX = e.X;
+                    initY = e.Y;
 
                     if (isFocus)
                     {
@@ -417,6 +407,22 @@ namespace GazeAwareForms
             startPaint = false;
             initX = null;
             initY = null;
+        }
+
+        private void eyeCoordsCollection()
+        {
+            if (mode == 2) // collect eye coordinates only if it is mode 2
+            {
+                //using (var lightlyFilteredGazeDataStream = Program.EyeXHost.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered))
+                //{
+                //    lightlyFilteredGazeDataStream.Next += (s, e) =>
+                //    {
+                //        string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                //        eyeCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                //    };
+                //}               
+
+            }
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -484,6 +490,11 @@ namespace GazeAwareForms
             string fileName = String.Format(@"{0}\Intermediate OutFile " + count + ".jpg", path);
             bmp.Save(fileName, ImageFormat.Jpeg);
             countIntermediate++;
+        }
+
+        private void btnVisionArea_Click(object sender, EventArgs e)
+        {
+            visibleArea = visibleArea ? false : true;
         }
 
         private void button1_Click(object sender, EventArgs e)
