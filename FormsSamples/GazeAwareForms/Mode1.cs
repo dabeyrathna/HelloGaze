@@ -71,7 +71,6 @@ namespace GazeAwareForms
             
         }
 
-
         private void initialDrawings(Panel panel1)
         {
             panel1.Invalidate();
@@ -275,7 +274,7 @@ namespace GazeAwareForms
 
         private void saveFinalResult()
         {
-            string fileName = "Final trace " + p1.id +".txt";
+            string fileName = "Patient\\Final trace " + p1.id +".txt";
 
             if (mouseCoord.Count > 1)
             {
@@ -292,7 +291,7 @@ namespace GazeAwareForms
                 mouseCoord.Clear();
 
                 if (mode == 2) {
-                    fileName = "Final eye " + p1.id + ".txt";
+                    fileName = "Patient\\Final eye " + p1.id + ".txt";
 
                     using (TextWriter tw = new StreamWriter(fileName, append: true))
                     {
@@ -308,7 +307,7 @@ namespace GazeAwareForms
 
         private void saveIntermediateResultis()
         {
-            string fileName = "Intermediate trace "+ p1.id + "Mode 1 Line "+ lineCount +".txt";
+            string fileName = "Patient\\Intermediate trace "+ p1.id + "Mode 1 Line "+ lineCount +".txt";
 
             if (mouseCoord.Count > 1)
             {
