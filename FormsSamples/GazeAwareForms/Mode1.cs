@@ -19,7 +19,7 @@ namespace GazeAwareForms
         Graphics g;
         Patient p1;
         int mode;
-        bool startPaint = false;
+        
         int? initX = null;
         int? initY = null;
         Pen p;
@@ -27,10 +27,21 @@ namespace GazeAwareForms
         int lineCount = 1;
         List<string> mouseCoord = new List<string>();
         List<string> eyeCoord = new List<string>();
-        bool messageBoxOn = false;
+        List<string> mirrorCoords = new List<string>();
+
+        bool tracingMessageBoxOn = false;
+        bool mirrorMassageBoxOn = false;
         bool isFocus = true;
+        bool isMirrorTracingDone = true;
+        bool startPaint = false;
+
         string path = "";
         Bitmap bmp;
+
+        int startingPointX;
+        int startingPointY;
+        int endingPointX;
+        int endingPointY;
 
         bool visibleArea = false;
 
@@ -141,14 +152,8 @@ namespace GazeAwareForms
 
             int panelCenterX = panel1.Width / 2;
             int panelCenterY = panel1.Height / 2;
-            float radius = 20;
 
-            SolidBrush myBrush = new SolidBrush(Color.Black);
-
-            int startingPointX;
-            int startingPointY;
-            int endingPointX;
-            int endingPointY;
+            SolidBrush myBrush = new SolidBrush(Color.Black);            
 
             if (lineCount == 1)
             {
@@ -184,7 +189,7 @@ namespace GazeAwareForms
                 panel2.Size = new System.Drawing.Size(startingPointX + 500, 300);
             }
 
-            g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
+            //g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
            // panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
            // panel2.Size = new System.Drawing.Size(100, 100);
@@ -193,7 +198,7 @@ namespace GazeAwareForms
             panel2.Visible = visibleArea;
             panel2.BringToFront();
         }
-
+       
         private void OnGaze(object sender, GazeAwareEventArgs e)
         {
             var panel = sender as Panel;
@@ -219,57 +224,209 @@ namespace GazeAwareForms
         {
             isFocus = false;         // globally indicate that patient was out of focus
 
-            if (!messageBoxOn) {
+            if (!mirrorMassageBoxOn && !isMirrorTracingDone && mode == 2)
+            {
+                displayMirrorMessageBox();
+            }
+            else if (!tracingMessageBoxOn && isMirrorTracingDone) {
+                displayTracingMessageBox();
+            }
+        }
 
-                messageBoxOn = true;  // globally indicate that message box popup
+        private void displayTracingMessageBox() {
+            tracingMessageBoxOn = true;  // globally indicate that message box popup
 
-                startPaint = false;  // if message box appear while drawing, this will stop drawing
-                initX = null;
-                initY = null;
+            startPaint = false;  // if message box appear while drawing, this will stop drawing
+            initX = null;
+            initY = null;
 
-                DialogResult dialogResult = MessageBox.Show("Are you done tracing ?\n \n1) Press Yes to trace the next line\n2) Press No to re Trace the line\n\n or \n\n Press Cancel to stop this message", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
-                if (dialogResult == DialogResult.Yes)
+            DialogResult dialogResult = MessageBox.Show("Are you done tracing ?\n \n1) Press Yes to trace the next line\n2) Press No to re Trace the line\n\n or \n\n Press Cancel to stop this message", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
+            if (dialogResult == DialogResult.Yes)
+            {
+                tracingMessageBoxOn = false;
+                if (lineCount < 3)
                 {
-                    messageBoxOn = false;
-                    if (lineCount < 3)
+                    if (mode == 1)
                     {
                         lineCount++;
                         saveFinalResult();
+                        LineDrawingMode1(panel1);
+                    }
+                    else if (mode == 2) {
+                        drawMirror(panel1, false);
+                        if (isMirrorTracingDone)
+                        {
+                            lineCount++;
+                            saveFinalResult();
+                            if (mode == 2)
+                            {
+                                LineDrawingMode2(panel1);
+                            }
+                            isMirrorTracingDone = false;
+                        }
+                    }
+                }
+                else
+                {
+                    drawMirror(panel1, false);
+                    tracingMessageBoxOn = true;
+                    if (isMirrorTracingDone || mode == 1)
+                    {
+                        saveFinalResult();
+                        initialDrawings(panel1);                        
+                        MessageBox.Show("You completed the mode " + mode + " tracing", "You are done");
+                    }
+                }
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                tracingMessageBoxOn = false;
+                // todo save the current content
+                if (mode == 1)
+                {
+                    LineDrawingMode1(panel1);
+                }
+                else if (mode == 2)
+                {
+                    LineDrawingMode2(panel1);
+                }
 
-                        if (mode == 1)
-                        {
-                            LineDrawingMode1(panel1);
-                        }
-                        else if (mode == 2)
-                        {
-                            LineDrawingMode2(panel1);
-                        }
+                p = new Pen(Color.Green, 3);
+                saveIntermediateResultis();
+            }
+            else if (dialogResult == DialogResult.Cancel)
+            {
+                tracingMessageBoxOn = true;
+            }
+        }
+
+        private void displayMirrorMessageBox() {
+            mirrorMassageBoxOn = true;  // globally indicate that message box popup
+
+            startPaint = false;  // if message box appear while drawing, this will stop drawing
+            initX = null;
+            initY = null;
+
+            DialogResult dialogResult = MessageBox.Show("Are you done tracing mirror line?\n \n1) Press Yes to proceed\n2) Press No to re Trace the mirror line\n\n or \n\n Press Cancel to stop this message", "You are out of focus !!!", MessageBoxButtons.YesNoCancel);
+            if (dialogResult == DialogResult.Yes)
+            {
+                mirrorMassageBoxOn = false;
+                mirrorCoords.Clear();               
+
+                bool reDrawMirror = checkOverlappingOfTracingAndRL();  // todo
+
+                if (!reDrawMirror)
+                {
+                    MessageBox.Show("re draw called");
+                    drawMirror(panel1, false);
+                }
+                else
+                {
+                    isMirrorTracingDone = true;
+                    mouseCoord.Clear();                    
+
+                   // MessageBox.Show("mirror completed count is "+lineCount);
+
+                    if (lineCount < 3)
+                    {
+                        lineCount++;
+                        tracingMessageBoxOn = false;
+                        LineDrawingMode2(panel1);
                     }
                     else {
                         saveFinalResult();
                         initialDrawings(panel1);
-                        messageBoxOn = true;
-                        MessageBox.Show("You completed the mode " + mode + " tracing", "You are done");                        
-                    }                    
-                }
-                else if (dialogResult == DialogResult.No)
+                        tracingMessageBoxOn = true;
+                        MessageBox.Show("You completed the mode " + mode + " tracing", "You are done");
+                    }
+                }                
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                mirrorMassageBoxOn = false;
+                drawMirror(panel1, true);
+                //saveIntermediateResultis();
+            }
+            else if (dialogResult == DialogResult.Cancel)
+            {
+                tracingMessageBoxOn = true;
+                mirrorMassageBoxOn = true;
+            }
+        }
+
+        private void drawMirror(Panel panel1, bool reDraw)
+        {
+            isMirrorTracingDone = false;
+            // g.Clear(Color.Transparent);//you can choose another color for your background here.
+            panel1.Invalidate();
+
+            bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
+            g = Graphics.FromImage(bmp);
+            g.Clear(Color.White);
+
+            string[] tempCoordinateUpdate;
+            if (!reDraw) {
+                mirrorCoords.Clear();
+                for (int i = 0; i < mouseCoord.Count; i++)
                 {
-                    messageBoxOn = false;
-                    // todo save the current content
-                    if (mode == 1) {
-                        LineDrawingMode1(panel1);
-                    }
-                    else if (mode == 2) {
-                        LineDrawingMode2(panel1);
-                    }
-                    
-                    p = new Pen(Color.Green, 3);
-                    saveIntermediateResultis();
+                    tempCoordinateUpdate = mouseCoord[i].Split(',');
+                    tempCoordinateUpdate[2] = (startingPointY - (Convert.ToInt32(tempCoordinateUpdate[2]) - startingPointY)).ToString();
+                    mirrorCoords.Add(tempCoordinateUpdate[0]+ "," + tempCoordinateUpdate[1] + "," + tempCoordinateUpdate[2]);
                 }
-                else if (dialogResult == DialogResult.Cancel) {
-                    messageBoxOn = true;
-                }             
-            }      
+            }
+
+            if (mirrorCoords.Count > 3)
+            {
+                int x = Convert.ToInt32(mirrorCoords[0].Split(',')[1]);
+                int y = Convert.ToInt32(mirrorCoords[0].Split(',')[2]);
+                int nextX;
+                int nextY;
+
+                for (int i = 1; i < mirrorCoords.Count; i++)
+                {
+                    p = new Pen(Color.Red, 3);
+                    using (g = Graphics.FromImage(bmp))
+                    {
+                        nextX = Convert.ToInt32(mirrorCoords[i].Split(',')[1]);
+                        nextY = Convert.ToInt32(mirrorCoords[i].Split(',')[2]);
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                        g.DrawLine(p, new Point(x, y), new Point(nextX, nextY));
+                        x = nextX;
+                        y = nextY;
+                    }
+                    panel1.Invalidate();
+                }
+                //g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
+
+                // panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
+                // panel2.Size = new System.Drawing.Size(100, 100);
+                panel2.BorderStyle = BorderStyle.FixedSingle;
+                panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
+                panel2.Visible = visibleArea;
+                panel2.BringToFront();
+            }
+        }
+
+        private bool checkOverlappingOfTracingAndRL()
+        {
+            int maxDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
+            int minDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
+            int tempDist = 0; 
+            for (int i = 1; i < mouseCoord.Count; i++) {
+                tempDist = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[i].Split(',')[2]));
+
+                if (tempDist > maxDistance) {
+                    maxDistance = tempDist;
+                }
+                if (tempDist < minDistance) {
+                    minDistance = tempDist;
+                }
+
+                if (minDistance < 1 || maxDistance < 10) {              // todo what should be the threashold
+                    //return false;
+                }
+            }
+            return true;
         }
 
         private void saveFinalResult()
@@ -280,9 +437,6 @@ namespace GazeAwareForms
             {
                 using (TextWriter tw = new StreamWriter(fileName, append: true))
                 {
-                    //foreach (String s in tempList)
-                    //    tw.WriteLine(s);
-
                     for(int i = 0; i < mouseCoord.Count; i++)
                         tw.WriteLine(mouseCoord[i]);
 
@@ -365,12 +519,12 @@ namespace GazeAwareForms
 
                     if (isFocus)
                     {
-                        if (mode == 1) // collect only tracing coordinates when it is mode 1
-                        {
+                        //if (mode == 1) // collect only tracing coordinates when it is mode 1
+                        //{
                             string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
                             mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
-                        }
-                        else if (mode == 2) // collect eye coordinates only if it is mode 2
+                        //}
+                        if (mode == 2) // collect eye coordinates only if it is mode 2
                         {
                             //using (var lightlyFilteredGazeDataStream = Program.EyeXHost.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered))
                             //{
@@ -389,10 +543,8 @@ namespace GazeAwareForms
                                 var fixationPointX = fixation.Data.LeftEye.X;
                                 var fixationPointY = fixation.Data.LeftEye.Y;
                                 var fixationPointZ = fixation.Data.LeftEye.Z;
-                                string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
-
                                 eyeCoord.Add(timeSapanInMillisec + "," + fixationPointX + "," + fixationPointY);
-                                mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+                               // mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
                             };
                         }
                     }  
@@ -426,7 +578,7 @@ namespace GazeAwareForms
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            messageBoxOn = false;
+            tracingMessageBoxOn = false;
             lineCount = 1;
 
             if (mode == 1) {
@@ -456,7 +608,7 @@ namespace GazeAwareForms
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            messageBoxOn = false;
+            tracingMessageBoxOn = false;
             if (lineCount < 3)
             {                
                 lineCount++;
@@ -467,7 +619,7 @@ namespace GazeAwareForms
             {
                 saveFinalResult();
                 initialDrawings(panel1);
-                messageBoxOn = true;
+                tracingMessageBoxOn = true;
                 MessageBox.Show("You completed the mode "+mode+" tracing", "You are done");                
             }
         }
