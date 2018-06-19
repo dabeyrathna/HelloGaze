@@ -17,7 +17,7 @@ namespace GazeAwareForms
     public partial class Mode1 : Form
     {
         Graphics g;
-        Patient p1;
+        PatientInfo p1;
         int mode;
         
         int? initX = null;
@@ -51,8 +51,6 @@ namespace GazeAwareForms
         public Mode1()
         {
             InitializeComponent();
-
-            p1 = new Patient("P123123","Adithi");
             mode = 1;
             Program.EyeXHost.Connect(behaviorMap1);
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
@@ -133,8 +131,8 @@ namespace GazeAwareForms
                      
             g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
-            panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
-            panel2.Size = new System.Drawing.Size(100, 100);
+            panel2.Location = new Point(panelCenterX - 100, panelCenterY - 100);
+            panel2.Size = new System.Drawing.Size(200, 200);
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.BackColor = Color.FromArgb(0, 0, 0, 0);
             panel2.BringToFront();
@@ -431,7 +429,7 @@ namespace GazeAwareForms
 
         private void saveFinalResult()
         {
-            string fileName = "Patient\\Final trace " + p1.id +".txt";
+            string fileName = "Patient\\Final trace " + PatientInfo.patientId +".txt";
 
             if (mouseCoord.Count > 1)
             {
@@ -445,7 +443,7 @@ namespace GazeAwareForms
                 mouseCoord.Clear();
 
                 if (mode == 2) {
-                    fileName = "Patient\\Final eye " + p1.id + ".txt";
+                    fileName = "Patient\\Final eye " + PatientInfo.patientId + ".txt";
 
                     using (TextWriter tw = new StreamWriter(fileName, append: true))
                     {
@@ -461,7 +459,7 @@ namespace GazeAwareForms
 
         private void saveIntermediateResultis()
         {
-            string fileName = "Patient\\Intermediate trace "+ p1.id + "Mode 1 Line "+ lineCount +".txt";
+            string fileName = "Patient\\Intermediate trace "+ PatientInfo.patientId + "Mode 1 Line "+ lineCount +".txt";
 
             if (mouseCoord.Count > 1)
             {

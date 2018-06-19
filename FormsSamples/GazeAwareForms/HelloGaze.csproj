@@ -116,6 +116,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calibration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Calibration.Designer.cs">
+      <DependentUpon>Calibration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gaze.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gaze.Designer.cs">
+      <DependentUpon>Gaze.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gestures.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gestures.Designer.cs">
+      <DependentUpon>Gestures.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mode1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -128,7 +152,7 @@
     <Compile Include="Mode2.Designer.cs">
       <DependentUpon>Mode2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patient.cs" />
+    <Compile Include="PatientInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StartForm.cs">
@@ -137,12 +161,30 @@
     <Compile Include="StartForm.Designer.cs">
       <DependentUpon>StartForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tracing Screen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tracing Screen.Designer.cs">
+      <DependentUpon>Tracing Screen.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl1.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControl1.Designer.cs">
       <DependentUpon>UserControl1.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Calibration.resx">
+      <DependentUpon>Calibration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gaze.resx">
+      <DependentUpon>Gaze.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gestures.resx">
+      <DependentUpon>Gestures.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Mode1.resx">
       <DependentUpon>Mode1.cs</DependentUpon>
     </EmbeddedResource>
@@ -161,6 +203,9 @@
     </Compile>
     <EmbeddedResource Include="StartForm.resx">
       <DependentUpon>StartForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tracing Screen.resx">
+      <DependentUpon>Tracing Screen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl1.resx">
       <DependentUpon>UserControl1.cs</DependentUpon>

@@ -30,7 +30,7 @@ namespace GazeAwareForms
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Mode1());
+            Application.Run(new HelloGaze_Login());
 
             _eyeXHost.Dispose();
         }
