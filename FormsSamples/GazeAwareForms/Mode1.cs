@@ -43,15 +43,24 @@ namespace GazeAwareForms
         int endingPointX;
         int endingPointY;
 
+        int mirrorClosingFactor = 0;
+        int mirroDrawingCount = 0;
+
         bool visibleArea = false;
 
         private readonly Host host;
         private readonly EyePositionStream eyePositionStream;
 
-        public Mode1()
+        public Mode1(int mode)
         {
             InitializeComponent();
-            mode = 1;
+
+            SetStyle(ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.ResizeRedraw, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.UserPaint, true);
+
+            this.mode = mode;
             Program.EyeXHost.Connect(behaviorMap1);
            // behaviorMap1.Add(panel1, new GazeAwareBehavior(OnGaze));
             behaviorMap1.Add(panel2, new EyeXFramework.GazeAwareBehavior(OnGaze) { DelayMilliseconds = 100 });
@@ -388,10 +397,13 @@ namespace GazeAwareForms
                         nextX = Convert.ToInt32(mirrorCoords[i].Split(',')[1]);
                         nextY = Convert.ToInt32(mirrorCoords[i].Split(',')[2]);
                         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                        g.DrawLine(p, new Point(x, y), new Point(nextX, nextY));
+                        g.DrawLine(p, new Point(x, y + mirrorClosingFactor), new Point(nextX, nextY+ mirrorClosingFactor));
                         x = nextX;
                         y = nextY;
                     }
+                    mirrorClosingFactor = mirrorClosingFactor / 2;
+                    mirroDrawingCount++;
+
                     panel1.Invalidate();
                 }
                 //g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
@@ -407,6 +419,17 @@ namespace GazeAwareForms
 
         private bool checkOverlappingOfTracingAndRL()
         {
+            if (mirrorClosingFactor > 1)
+            {
+                return false;
+            }
+
+            if (mirroDrawingCount > 2) {
+                mirroDrawingCount = 0;
+                mirrorClosingFactor = 0;
+                return true;
+            }
+
             int maxDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
             int minDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
             int tempDist = 0; 
@@ -420,8 +443,9 @@ namespace GazeAwareForms
                     minDistance = tempDist;
                 }
 
-                if (minDistance < 1 || maxDistance < 10) {              // todo what should be the threashold
-                    //return false;
+                if (minDistance > 30) {              // todo what should be the threashold
+                    mirrorClosingFactor = minDistance / 2;
+                    return false;
                 }
             }
             return true;
@@ -624,6 +648,7 @@ namespace GazeAwareForms
 
         private void btnChangeMode_Click(object sender, EventArgs e)
         {
+            /*
             if (mode == 1) {
                 mode = 2;
                 eyeCoordsCollection(); // when mode 2 activated eye coordinates collection starts
@@ -632,6 +657,11 @@ namespace GazeAwareForms
                 mode = 1;
             }
             lblMode.Text = "Mode " + mode;
+
+            */
+            Mode1 f1 = new Mode1(2);
+            f1.Show();
+            this.Hide();
         }
 
         private void saveIntermediateTracing() {

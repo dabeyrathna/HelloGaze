@@ -58,7 +58,7 @@ namespace GazeAwareForms
 
         private void startExp_Click(object sender, EventArgs e)
         {
-            Mode1 mode1Form = new Mode1();
+            Mode1 mode1Form = new Mode1(1);
             this.Hide();
             mode1Form.Show();
         }

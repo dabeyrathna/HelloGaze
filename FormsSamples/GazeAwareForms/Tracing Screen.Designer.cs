@@ -169,6 +169,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(882, 553);
             this.Controls.Add(this.panel1);
+            this.DoubleBuffered = true;
             this.Name = "Tracing_Screen";
             this.Text = "Tracing_Screen";
             this.panel1.ResumeLayout(false);

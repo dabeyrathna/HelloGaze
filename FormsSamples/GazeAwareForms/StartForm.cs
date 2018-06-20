@@ -19,7 +19,7 @@ namespace GazeAwareForms
 
         private void btnMode1_Click(object sender, EventArgs e)
         {
-            Form mode1 = new Mode1();
+            Form mode1 = new Mode1(1);
             mode1.Show();
         }
 

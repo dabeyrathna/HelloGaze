@@ -135,6 +135,7 @@
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.btnSaveImage);
             this.Controls.Add(this.panel1);
+            this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Mode1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
