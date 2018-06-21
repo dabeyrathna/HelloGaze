@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tobii.EyeX.Framework;
@@ -55,10 +56,8 @@ namespace GazeAwareForms
         {
             InitializeComponent();
 
-            SetStyle(ControlStyles.DoubleBuffer, true);
-            SetStyle(ControlStyles.ResizeRedraw, true);
-            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(ControlStyles.UserPaint, true);
+            typeof(Panel).InvokeMember("DoubleBuffered", BindingFlags.SetProperty |
+                BindingFlags.Instance | BindingFlags.NonPublic, null, panel1, new object[] { true });
 
             this.mode = mode;
             Program.EyeXHost.Connect(behaviorMap1);
@@ -545,6 +544,11 @@ namespace GazeAwareForms
                         //{
                             string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
                             mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+
+                            if (mouseCoord.Count > 10000)
+                            {
+                                mouseCoord.RemoveRange(1, 1000);
+                            }
                         //}
                         if (mode == 2) // collect eye coordinates only if it is mode 2
                         {
@@ -566,6 +570,10 @@ namespace GazeAwareForms
                                 var fixationPointY = fixation.Data.LeftEye.Y;
                                 var fixationPointZ = fixation.Data.LeftEye.Z;
                                 eyeCoord.Add(timeSapanInMillisec + "," + fixationPointX + "," + fixationPointY);
+
+                                if (eyeCoord.Count > 10000) {
+                                    eyeCoord.RemoveRange(1, 1000);
+                                }
                                // mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
                             };
                         }

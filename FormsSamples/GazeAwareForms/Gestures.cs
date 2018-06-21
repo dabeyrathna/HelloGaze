@@ -4,13 +4,18 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EyeXFramework;
+using EyeXFramework.Forms;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using GazeAwareForms;
 
-namespace GazeAwareForms
+namespace HelloGaze
 {
     public partial class Gestures : Form
     {
@@ -27,19 +32,21 @@ namespace GazeAwareForms
         //bool messageBoxOn = false;
         bool isFocus = true;
         string path = "";
-       
+
+        
+
         public Gestures()
         {
             InitializeComponent();
-
             p = new Pen(Color.Blue, 3);
+            typeof(Panel).InvokeMember("DoubleBuffered", BindingFlags.SetProperty |
+                BindingFlags.Instance | BindingFlags.NonPublic, null, panel1, new object[] { true });
         }
 
         Bitmap bmp;
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
             initialDrawings(panel1);
         }
 
@@ -55,14 +62,14 @@ namespace GazeAwareForms
 
             //Randomly generate point 1
             Random r = new Random();
-            int x = r.Next(10, 60);
-            int y = r.Next(150, 350);
+            int x = 20;
+            int y = r.Next(110, 360);
             g.DrawEllipse(bluePen, x, y, 20, 20);
             g.FillEllipse(Brushes.Blue, x, y, 20, 20);
 
             //Randomly generate point 2
-            int a = r.Next(340, 390);
-            int b = r.Next(150, 350);
+            int a = 360;
+            int b = r.Next(110, 360);
             g.DrawEllipse(bluePen, a, b, 20, 20);
             g.FillEllipse(Brushes.Blue, a, b, 20, 20);
         }
@@ -94,10 +101,8 @@ namespace GazeAwareForms
 
                     g.DrawLine(p, new Point(initX ?? e.X, initY ?? e.Y), new Point(e.X, e.Y));
 
-
                     initX = e.X;
                     initY = e.Y;
-
                 }
                 panel1.Invalidate();
             }
@@ -106,10 +111,8 @@ namespace GazeAwareForms
         private void changePath()
         {
             //Use patient ID to store images in folder
-            string patient = "Patient " + PatientInfo.patientId;
-            path = @"Patient\\"+ patient;
-            //MessageBox.Show(path); -- test
-            // never use static paths in a application
+            string patient = "Patient" + PatientInfo.patientId;
+            path = @"" + "HelloGaze DB" + "\\" + patient;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
@@ -126,7 +129,6 @@ namespace GazeAwareForms
 
         private void Save_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("sdsadas");
             changePath();
             string fileName = String.Format(@"{0}\\Gesture_Cal " + count + ".jpg", path);
             bmp.Save(fileName, ImageFormat.Jpeg);
@@ -149,11 +151,6 @@ namespace GazeAwareForms
                 this.Hide();
                 Calibration.Current.ShowDialog();
             }
-        }
-
-        private void Save_Click_1(object sender, EventArgs e)
-        {
-
         }
     }
 }

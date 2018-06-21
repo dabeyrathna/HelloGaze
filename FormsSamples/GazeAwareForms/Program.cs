@@ -5,6 +5,7 @@
 namespace GazeAwareForms
 {
     using EyeXFramework.Forms;
+    using HelloGaze;
     using System;
     using System.Windows.Forms;
 

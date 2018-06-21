@@ -7,60 +7,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EyeXFramework;
 
-namespace GazeAwareForms
+namespace HelloGaze
 {
+    using EyeXFramework;
+    using GazeAwareForms;
+
     public partial class Calibration : Form
     {
         public static Calibration Current;
-
+        
         public Calibration()
         {
             InitializeComponent();
-            label4.Text = PatientInfo.patientName;
             Current = this;
-
-            startExp.Enabled = true;
+            circularProgressBar.Value = 0;
         }
 
-        private void gestureCalibration_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            timer1.Start();
-            this.calibrationProgress.Increment(50);
-            timer1.Stop();
-            startExp.Enabled = true;
-      
-            Gestures gestureForm = new Gestures();
+            Mode1 objForm1 = new Mode1(1);
             this.Hide();
-            gestureForm.Show();
+            objForm1.Show();
         }
 
         private void gazeCalibration_Click(object sender, EventArgs e)
         {
-            timer1.Start();
-            //MessageBox.Show("Perform Gesture Calibration!");
-            this.calibrationProgress.Increment(50);
-            timer1.Stop();
-            startExp.Enabled = true;
+            gazeCalibration.Enabled = false;
+            this.circularProgressBar.Increment(50);
+            Gaze objForm2 = new Gaze();
+            objForm2.Show();
+         }
 
-            Gaze gazeForm = new Gaze();
-            //this.Hide();
-            gazeForm.Show();
-            //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Tobii\\Tobii EyeX Interaction\\Tobii.EyeX.Tray.exe");
+        private void gestureCalibration_Click(object sender, EventArgs e)
+        {
+            gestureCalibration.Enabled = false;
+            startExp.Enabled = true;
+            startExp.BackColor = Color.Turquoise;
+            startExp.FlatAppearance.BorderColor = Color.Turquoise;
+            Gestures objForm1 = new Gestures(); 
+            circularProgressBar.Increment(50);
+            this.Hide();
+            objForm1.Show();
         }
 
         private void resetCalib_Click(object sender, EventArgs e)
         {
-            startExp.Enabled = true;
-            //timer1.Start();
-            this.calibrationProgress.Value = 0;
+            startExp.Enabled = false;         
         }
 
-        private void startExp_Click(object sender, EventArgs e)
+        private void Calibration_Load(object sender, EventArgs e)
         {
-            Mode1 mode1Form = new Mode1(1);
-            this.Hide();
-            mode1Form.Show();
+            label2.Text = "Hi " + PatientInfo.patientName + "!";
+            this.ActiveControl = label2;
         }
     }
 }

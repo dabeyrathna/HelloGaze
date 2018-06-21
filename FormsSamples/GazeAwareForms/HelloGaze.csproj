@@ -92,6 +92,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CircularProgressBar">
+      <HintPath>C:\Users\cc\source\repos\HelloGaze5AdithiLast\HelloGaze\bin\Debug\CircularProgressBar.dll</HintPath>
+    </Reference>
     <Reference Include="EyeXFramework, Version=1.8.503.0, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Tobii.EyeX.Framework.1.8.503\lib\net40\EyeXFramework.dll</HintPath>
       <Private>True</Private>
@@ -114,24 +117,27 @@
     <Reference Include="Tobii.Research, Version=1.5.0.942, Culture=neutral, PublicKeyToken=70326046dcdce6cb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Tobii.Research.x86.1.5.0.942\lib\net45\Tobii.Research.dll</HintPath>
     </Reference>
+    <Reference Include="WinFormAnimation">
+      <HintPath>C:\Users\cc\source\repos\HelloGaze5AdithiLast\HelloGaze\bin\Debug\WinFormAnimation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calibration.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Calibration.Designer.cs">
+    <Compile Include="Calibration.designer.cs">
       <DependentUpon>Calibration.cs</DependentUpon>
     </Compile>
     <Compile Include="Gaze.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Gaze.Designer.cs">
+    <Compile Include="Gaze.designer.cs">
       <DependentUpon>Gaze.cs</DependentUpon>
     </Compile>
     <Compile Include="Gestures.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Gestures.Designer.cs">
+    <Compile Include="Gestures.designer.cs">
       <DependentUpon>Gestures.cs</DependentUpon>
     </Compile>
     <Compile Include="Login.cs">
