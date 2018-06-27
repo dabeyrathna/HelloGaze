@@ -39,6 +39,7 @@
             this.btnChangeMode = new System.Windows.Forms.Button();
             this.lblMode = new System.Windows.Forms.Label();
             this.btnVisionArea = new System.Windows.Forms.Button();
+            this.btnExit = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -123,11 +124,22 @@
             this.btnVisionArea.UseVisualStyleBackColor = true;
             this.btnVisionArea.Click += new System.EventHandler(this.btnVisionArea_Click);
             // 
+            // btnExit
+            // 
+            this.btnExit.Location = new System.Drawing.Point(1621, 722);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(91, 36);
+            this.btnExit.TabIndex = 16;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
             // Mode1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1760, 802);
+            this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnVisionArea);
             this.Controls.Add(this.lblMode);
             this.Controls.Add(this.btnChangeMode);
@@ -157,6 +169,7 @@
         private System.Windows.Forms.Button btnChangeMode;
         private System.Windows.Forms.Label lblMode;
         private System.Windows.Forms.Button btnVisionArea;
+        private System.Windows.Forms.Button btnExit;
     }
 }
 

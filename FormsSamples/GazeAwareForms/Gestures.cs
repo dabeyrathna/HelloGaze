@@ -103,6 +103,15 @@ namespace HelloGaze
 
                     initX = e.X;
                     initY = e.Y;
+
+                    string timeSapanInMillisec = Convert.ToInt64(DateTime.Now.Subtract(new DateTime(1970, 1, 9, 0, 0, 00)).TotalMilliseconds).ToString();
+                    mouseCoord.Add(timeSapanInMillisec + "," + e.X + "," + e.Y);
+
+                    if (mouseCoord.Count > 10000)
+                    {
+                        mouseCoord.RemoveRange(1, 1000);
+                    }
+
                 }
                 panel1.Invalidate();
             }
@@ -130,6 +139,7 @@ namespace HelloGaze
         private void Save_Click(object sender, EventArgs e)
         {
             changePath();
+            saveGestureResultis();
             string fileName = String.Format(@"{0}\\Gesture_Cal " + count + ".jpg", path);
             bmp.Save(fileName, ImageFormat.Jpeg);
             count++;
@@ -150,6 +160,23 @@ namespace HelloGaze
             {
                 this.Hide();
                 Calibration.Current.ShowDialog();
+            }
+        }
+
+        private void saveGestureResultis()
+        {
+            string fileName = String.Format(@"{0}\\Gesture_Cal " + count + ".txt",path);
+
+            if (mouseCoord.Count > 1)
+            {
+                using (TextWriter tw = new StreamWriter(fileName, append: true))
+                {
+                    for (int i = 0; i < mouseCoord.Count; i++)
+                        tw.WriteLine(mouseCoord[i]);
+
+                    tw.WriteLine("----");
+                }
+                mouseCoord.Clear();
             }
         }
     }

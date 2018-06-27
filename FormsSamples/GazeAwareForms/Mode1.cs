@@ -18,7 +18,6 @@ namespace GazeAwareForms
     public partial class Mode1 : Form
     {
         Graphics g;
-        PatientInfo p1;
         int mode;
         
         int? initX = null;
@@ -44,8 +43,9 @@ namespace GazeAwareForms
         int endingPointX;
         int endingPointY;
 
-        int mirrorClosingFactor = 0;
+        int mirrorClosingFactor = 1;
         int mirroDrawingCount = 0;
+        int mirrorSameLineCount = 0;
 
         bool visibleArea = false;
 
@@ -259,8 +259,13 @@ namespace GazeAwareForms
                         LineDrawingMode1(panel1);
                     }
                     else if (mode == 2) {
-                        drawMirror(panel1, false);
-                        if (isMirrorTracingDone)
+
+                        bool isDrawMirror = checkOverlappingOfTracingAndRL();  // if avgY deviate more than 30
+
+                        if (isDrawMirror) {
+                                drawMirror(panel1, false);
+                        }
+                        if (isMirrorTracingDone || !isDrawMirror)
                         {
                             lineCount++;
                             saveFinalResult();
@@ -298,6 +303,7 @@ namespace GazeAwareForms
                 }
 
                 p = new Pen(Color.Green, 3);
+                changePath();
                 saveIntermediateResultis();
             }
             else if (dialogResult == DialogResult.Cancel)
@@ -317,21 +323,20 @@ namespace GazeAwareForms
             if (dialogResult == DialogResult.Yes)
             {
                 mirrorMassageBoxOn = false;
-                mirrorCoords.Clear();               
-
-                bool reDrawMirror = checkOverlappingOfTracingAndRL();  // todo
-
-                if (!reDrawMirror)
+                saveMirrorImages();
+                if (mirrorClosingFactor != 0)
                 {
-                    MessageBox.Show("re draw called");
-                    drawMirror(panel1, false);
+                    //MessageBox.Show("re draw called");
+                    drawMirror(panel1, true);
                 }
                 else
                 {
+                    mirrorCoords.Clear();
+                    mouseCoord.Clear();
                     isMirrorTracingDone = true;
                     mouseCoord.Clear();                    
 
-                   // MessageBox.Show("mirror completed count is "+lineCount);
+                    // MessageBox.Show("mirror completed count is "+lineCount);
 
                     if (lineCount < 3)
                     {
@@ -369,7 +374,7 @@ namespace GazeAwareForms
             bmp = new Bitmap(panel1.ClientSize.Width, panel1.ClientSize.Height);
             g = Graphics.FromImage(bmp);
             g.Clear(Color.White);
-
+            int closingFactor = mirrorClosingFactor;
             string[] tempCoordinateUpdate;
             if (!reDraw) {
                 mirrorCoords.Clear();
@@ -380,6 +385,29 @@ namespace GazeAwareForms
                     mirrorCoords.Add(tempCoordinateUpdate[0]+ "," + tempCoordinateUpdate[1] + "," + tempCoordinateUpdate[2]);
                 }
             }
+
+            if (reDraw)
+            {
+                if (mirrorSameLineCount == 0)
+                {
+                    mirrorSameLineCount++;
+                    mirroDrawingCount--;
+                }
+            }
+            else {
+                mirrorSameLineCount = 0;
+            }
+
+            if (mirroDrawingCount == 2) {
+
+                closingFactor = mirrorClosingFactor/2;
+            }
+            if (mirroDrawingCount == 3)
+            {
+                closingFactor = 0;
+                mirrorClosingFactor = 0;
+            }
+            
 
             if (mirrorCoords.Count > 3)
             {
@@ -396,17 +424,17 @@ namespace GazeAwareForms
                         nextX = Convert.ToInt32(mirrorCoords[i].Split(',')[1]);
                         nextY = Convert.ToInt32(mirrorCoords[i].Split(',')[2]);
                         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                        g.DrawLine(p, new Point(x, y + mirrorClosingFactor), new Point(nextX, nextY+ mirrorClosingFactor));
+                        g.DrawLine(p, new Point(x, y + (closingFactor)), new Point(nextX, nextY + (closingFactor)));
                         x = nextX;
                         y = nextY;
                     }
-                    mirrorClosingFactor = mirrorClosingFactor / 2;
-                    mirroDrawingCount++;
-
                     panel1.Invalidate();
                 }
-                //g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
 
+                saveMirroLine();
+
+                mirroDrawingCount++;
+                //g.FillEllipse(myBrush, panelCenterX - radius, panelCenterY - radius, radius + radius, radius + radius);
                 // panel2.Location = new Point(panelCenterX - 50, panelCenterY - 50);
                 // panel2.Size = new System.Drawing.Size(100, 100);
                 panel2.BorderStyle = BorderStyle.FixedSingle;
@@ -416,44 +444,65 @@ namespace GazeAwareForms
             }
         }
 
+
+
         private bool checkOverlappingOfTracingAndRL()
         {
-            if (mirrorClosingFactor > 1)
-            {
-                return false;
-            }
-
-            if (mirroDrawingCount > 2) {
-                mirroDrawingCount = 0;
-                mirrorClosingFactor = 0;
-                return true;
-            }
-
             int maxDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
             int minDistance = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[0].Split(',')[2])); 
             int tempDist = 0; 
             for (int i = 1; i < mouseCoord.Count; i++) {
-                tempDist = Math.Abs(startingPointY - Convert.ToInt32(mouseCoord[i].Split(',')[2]));
+                tempDist += startingPointY - Convert.ToInt32(mouseCoord[i].Split(',')[2]);
+            }
 
-                if (tempDist > maxDistance) {
-                    maxDistance = tempDist;
-                }
-                if (tempDist < minDistance) {
-                    minDistance = tempDist;
-                }
+            int avgDist = tempDist / mouseCoord.Count;
 
-                if (minDistance > 30) {              // todo what should be the threashold
-                    mirrorClosingFactor = minDistance / 2;
-                    return false;
+            //MessageBox.Show(avgDist.ToString());
+
+            if (Math.Abs(avgDist - startingPointY) > 5)
+            {
+                mirroDrawingCount = 1;
+                mirrorClosingFactor = avgDist/3;
+                return true;
+            }
+            else {
+                mirroDrawingCount = 3;
+                mirrorClosingFactor = 0;
+                return false;
+            }
+        }
+
+        private void saveMirrorImages() {
+            changePath();
+            string fileName = String.Format(@"{0}\Mirror image Trace of line " + lineCount + " No " + mirroDrawingCount + ".jpg", path);
+            bmp.Save(fileName, ImageFormat.Jpeg);
+        }
+
+        private void saveMirroLine()
+        {
+            changePath();
+            string fileName = String.Format(@"{0}\Mirror image of line " + lineCount + " No " + mirroDrawingCount + ".jpg", path);
+            bmp.Save(fileName, ImageFormat.Jpeg);
+
+            fileName = String.Format(@"{0}\Mirror image of line " + lineCount + " No " + mirroDrawingCount + ".txt", path);
+
+            if (mirrorCoords.Count > 1)
+            {
+                using (TextWriter tw = new StreamWriter(fileName, append: true))
+                {
+                    for (int i = 0; i < mirrorCoords.Count; i++)
+                        tw.WriteLine(mouseCoord[i]);
+
+                    tw.WriteLine("----");
                 }
             }
-            return true;
         }
 
         private void saveFinalResult()
         {
-            string fileName = "Patient\\Final trace " + PatientInfo.patientId +".txt";
+            changePath();
 
+            string fileName = String.Format(@"{0}\\Final trace line "+lineCount+ ".txt",path);
             if (mouseCoord.Count > 1)
             {
                 using (TextWriter tw = new StreamWriter(fileName, append: true))
@@ -466,7 +515,8 @@ namespace GazeAwareForms
                 mouseCoord.Clear();
 
                 if (mode == 2) {
-                    fileName = "Patient\\Final eye " + PatientInfo.patientId + ".txt";
+                    
+                    fileName = String.Format(@"{0}\\Final eye line " + lineCount + ".txt",path);
 
                     using (TextWriter tw = new StreamWriter(fileName, append: true))
                     {
@@ -482,7 +532,8 @@ namespace GazeAwareForms
 
         private void saveIntermediateResultis()
         {
-            string fileName = "Patient\\Intermediate trace "+ PatientInfo.patientId + "Mode 1 Line "+ lineCount +".txt";
+            changePath();
+            string fileName = String.Format(@"{0}\\Intermediate trace " + mode + ".txt",path);
 
             if (mouseCoord.Count > 1)
             {
@@ -494,20 +545,6 @@ namespace GazeAwareForms
                     tw.WriteLine("----");
                 }
                 mouseCoord.Clear();
-
-                //if (mode == 2)
-                //{
-                //    fileName = "Intermediate eye " + p1.id + "Mode 1 Line " + lineCount + ".txt";
-
-                //    using (TextWriter tw = new StreamWriter(fileName, append: true))
-                //    {
-                //        foreach (String s in eyeCoord)
-                //            tw.WriteLine(s);
-
-                //        tw.WriteLine("----");
-                //    }
-                //    eyeCoord.Clear();
-                //}
             }
         }
 
@@ -608,8 +645,7 @@ namespace GazeAwareForms
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            tracingMessageBoxOn = false;
-            lineCount = 1;
+            resetParam();            
 
             if (mode == 1) {
                 LineDrawingMode1(panel1);
@@ -620,6 +656,12 @@ namespace GazeAwareForms
             
         }
 
+        private void resetParam() {
+            tracingMessageBoxOn = false;
+            mirrorMassageBoxOn = false;
+            lineCount = 1;
+        }
+
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(bmp, Point.Empty);
@@ -627,11 +669,9 @@ namespace GazeAwareForms
 
         private void changePath()
         {
-            Random r = new Random();                        // todo : dynamic path selection
-            int rInt = r.Next(0, 10000);
-            // string patientID = "Patient" + rInt;
-            string patientID = "Patient";
-            path = @"" + Application.StartupPath + "\\" + patientID;
+            //Use patient ID to store images in folder
+            string patient = "Patient" + PatientInfo.patientId;
+            path = @"" + "HelloGaze DB" + "\\" + patient;
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
         }
@@ -656,19 +696,16 @@ namespace GazeAwareForms
 
         private void btnChangeMode_Click(object sender, EventArgs e)
         {
-            /*
+            Mode1 modeChange; 
             if (mode == 1) {
-                mode = 2;
-                eyeCoordsCollection(); // when mode 2 activated eye coordinates collection starts
+                modeChange = new Mode1(2);
             }
             else {
-                mode = 1;
+                modeChange = new Mode1(1);
             }
             lblMode.Text = "Mode " + mode;
 
-            */
-            Mode1 f1 = new Mode1(2);
-            f1.Show();
+            modeChange.Show();
             this.Hide();
         }
 
@@ -682,6 +719,11 @@ namespace GazeAwareForms
         private void btnVisionArea_Click(object sender, EventArgs e)
         {
             visibleArea = visibleArea ? false : true;
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         private void button1_Click(object sender, EventArgs e)
